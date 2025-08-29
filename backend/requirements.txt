@@ -1,7 +1,12 @@
 django
 djangorestframework
+djangorestframework-gis
+django-environ
 gunicorn
 psycopg2-binary
 whitenoise
 python-dotenv
 dj-database-url
+python-decouple
+djangorestframework-simplejwt
+django-cors-headers

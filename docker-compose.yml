@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=placamar
+      - POSTGRES_USER=placamar
+      - POSTGRES_PASSWORD=placamar
+    ports:
+      - "5432:5432"
+    networks:
+      - placamar_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U placamar -d placamar"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://placamar:placamar@db:5432/placamar
+      - SECRET_KEY=dev-secret
+      - DEBUG=1
+    networks:
+      - placamar_net
+
+volumes:
+  postgres_data:
+
+networks:
+  placamar_net:
+    driver: bridge
